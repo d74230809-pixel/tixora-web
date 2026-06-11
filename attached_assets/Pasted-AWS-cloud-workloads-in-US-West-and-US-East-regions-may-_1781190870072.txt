@@ -1,0 +1,214 @@
+AWS cloud workloads in US West and US East regions may experience failures to respond. We are investigating the incident.
+
+View details
+
+
+
+natural-cooperation
+
+production
+
+
+
+28 days or $4.82 left
+
+
+Agent
+
+
+
+
+
+
+tixora-web
+Deployments
+Variables
+Metrics
+Console
+Settings
+Filter settings
+Filter Settings...
+
+/
+Source
+Source Repo
+d74230809-pixel/tixora-web
+
+
+
+Disconnect
+Add Root Directory (used for build and deploy steps. Docs↗)
+Branch connected to production
+Changes made to this GitHub branch will be automatically pushed to this environment.
+main
+
+Disconnect
+Auto deploys when pushed to GitHub
+
+Disable
+Wait for CI
+Trigger deployments after all GitHub actions have completed successfully.
+
+Networking
+Public Networking
+Access your application over HTTP with the following domains
+tixorabot.up.railway.app
+Port 8080
+
+
+
+
+
+Domain
+tixorabot
+.up.railway.app
+
+Enter the port your app is listening on
+
+Target port
+8080
+Update your domain or target port
+
+
+Cancel
+
+Update
+
+Custom Domain
+
+TCP Proxy
+Private Networking
+Communicate with this service from within the Railway network.
+tixora-web.railway.internal
+IPv4 & IPv6
+
+
+Ready to talk privately ·
+You can also simply call me
+tixora-web
+
+DNS
+tixora-web
+.railway.internal
+
+Endpoint name available!
+
+
+Cancel
+
+Update
+Outbound IPv6
+Enable your service to make outbound connections to IPv6 destinations.
+
+Edge
+Under Attack Mode
+Being DDoSed? One click puts a browser check in front of your domains, shedding bot floods at the edge. Real visitors solve it once and browse normally.
+Until turned off
+
+Activate
+Takes effect across the globe in ~20 seconds.
+
+CDN Caching
+Cache static assets and optionally HTML at the edge. Reduces latency and origin load for your service's domains.
+
+Scale
+Regions & Replicas
+Deploy replicas per region for horizontal scaling.
+US West (California, USA)
+
+Replicas
+1
+Replica
+Multi-region replicas are only available on the Pro plan.
+
+Learn More↗
+Replica Limits
+Allocate a maximum vCPU and Memory for each replica.
+CPU: 2 vCPU
+
+Plan limit: 2 vCPU
+
+
+Memory: 1 GB
+
+Plan limit: 1 GB
+
+
+Upgrade for higher limits
+Build
+Builder
+
+Railpack
+
+Default
+
+22.22.3node@22.22.3
+App builder developed by Railway. Docs↗
+
+Custom Build Command
+Override the default build command that is run when building your app. Docs↗
+The value is set in
+/railway.json
+Open file↗
+Build command
+pnpm install --no-frozen-lockfile && pnpm run build
+Watch Paths
+Gitignore-style rules to trigger a new deployment based on what file paths have changed. Docs↗
+Add pattern
+Add pattern e.g. /src/**
+
+Deploy
+Custom Start Command
+Command that will be run to start new deployments. Docs↗
+
+Start Command
+Add pre-deploy step (Docs↗)
+Teardown
+Configure old deployment termination when a new one is started. Docs↗
+
+Cron Schedule
+Run the service according to the specified cron schedule.
+
+Add Schedule
+Healthcheck Path
+Endpoint to be called before a deploy completes to ensure the new deployment is live. Docs↗
+
+Healthcheck Path
+Serverless
+Containers will scale down to zero and then scale up based on traffic. Requests while the container is sleeping will be queued and served when the container wakes up. Docs↗
+
+Restart Policy
+Configure what to do when the process exits. Docs↗
+On Failure
+
+Restart the container if it exits with a non-zero exit code.
+
+
+Your plan only supports up to 10 retries
+
+Upgrade
+Number of times to try and restart the service if it stopped due to an error.
+Max restart retries
+10
+Config-as-code
+Railway Config File
+Manage your build and deployment settings through a config file. Docs↗
+
+Add File Path
+Feature-flags
+
+
+
+Delete Service
+Deleting this service will permanently delete all its deployments and remove it from this environment. This cannot be undone.
+
+Delete service
+Source
+Networking
+Edge
+Scale
+Build
+Deploy
+Config-as-code
+Feature-flags
+Danger
