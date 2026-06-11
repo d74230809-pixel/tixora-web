@@ -1,0 +1,186 @@
+/* ============================================================
+   OWNER / GOD MODE THEME
+   Scoped exclusively to .owner-theme — never bleeds globally.
+   ============================================================ */
+
+.owner-theme {
+  --owner-bg: #0a0a0f;
+  --owner-bg-card: #13131f;
+  --owner-bg-card-hover: #1a1a2e;
+  --owner-accent: #7c3aed;
+  --owner-gold: #f59e0b;
+  --owner-violet: #a855f7;
+  --owner-accent-glow: rgba(124, 58, 237, 0.4);
+  --owner-gold-glow: rgba(245, 158, 11, 0.3);
+  --owner-gradient: linear-gradient(135deg, #7c3aed 0%, #a855f7 40%, #f59e0b 100%);
+  --owner-gradient-subtle: linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(245,158,11,0.08) 100%);
+  --owner-border: rgba(124, 58, 237, 0.25);
+  --owner-border-glow: rgba(124, 58, 237, 0.6);
+}
+
+/* ---- Floating orb background ---- */
+.owner-bg {
+  position: relative;
+  min-height: 100vh;
+  background: #0a0a0f;
+  overflow-x: hidden;
+}
+
+.owner-bg::before,
+.owner-bg::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.13;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.owner-bg::before {
+  width: 600px;
+  height: 600px;
+  background: #7c3aed;
+  top: -200px;
+  left: -200px;
+  animation: ownerOrb1 20s ease-in-out infinite alternate;
+}
+
+.owner-bg::after {
+  width: 420px;
+  height: 420px;
+  background: #f59e0b;
+  bottom: -120px;
+  right: -120px;
+  animation: ownerOrb2 15s ease-in-out infinite alternate;
+}
+
+@keyframes ownerOrb1 {
+  to { transform: translate(140px, 120px); }
+}
+@keyframes ownerOrb2 {
+  to { transform: translate(-80px, -90px); }
+}
+
+/* ---- Crown pulse ---- */
+@keyframes crownPulse {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(245,158,11,0.8)); }
+  50%      { filter: drop-shadow(0 0 28px rgba(245,158,11,1)) drop-shadow(0 0 50px rgba(124,58,237,0.7)); }
+}
+.owner-crown {
+  animation: crownPulse 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ---- Card with animated gradient border on hover ---- */
+.owner-card {
+  position: relative;
+  background: #13131f;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  border-radius: 0.75rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.owner-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 40%, #f59e0b 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border-radius: calc(0.75rem + 1px);
+}
+
+.owner-card:hover::before {
+  opacity: 1;
+}
+
+.owner-card:hover {
+  background: #1a1a2e;
+  box-shadow: 0 0 20px -8px rgba(124, 58, 237, 0.4);
+}
+
+/* ---- Gradient text ---- */
+.owner-gradient-text {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 40%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---- Active tab glow ---- */
+.owner-tab-active {
+  background: linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(245,158,11,0.07) 100%) !important;
+  border-bottom: 2px solid #7c3aed !important;
+  box-shadow: 0 0 14px -2px rgba(124, 58, 237, 0.45);
+  color: #a78bfa !important;
+}
+
+/* ---- Pulse dot ---- */
+@keyframes ownerPulseDot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.3); }
+}
+.owner-pulse-dot {
+  animation: ownerPulseDot 1.5s ease-in-out infinite;
+}
+
+/* ---- Live badge ---- */
+@keyframes ownerLive {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+.owner-live { animation: ownerLive 0.9s ease-in-out infinite; }
+
+/* ---- Stat count-up entrance ---- */
+@keyframes ownerStatIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.owner-stat-num {
+  animation: ownerStatIn 0.45s ease-out both;
+}
+
+/* ---- Stream mode extras ---- */
+.stream-active .owner-card {
+  animation: streamCardGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes streamCardGlow {
+  from { box-shadow: 0 0 6px rgba(124,58,237,0.15); }
+  to   { box-shadow: 0 0 24px rgba(124,58,237,0.55), 0 0 48px rgba(245,158,11,0.18); }
+}
+
+/* Stream ticker */
+.owner-ticker-wrap {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@keyframes tickerScroll {
+  0%   { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}
+.owner-ticker-inner {
+  display: inline-block;
+  animation: tickerScroll 35s linear infinite;
+}
+
+/* ---- Avatar glow ring ---- */
+.owner-avatar-ring {
+  box-shadow: 0 0 0 2px #7c3aed, 0 0 14px 2px rgba(124,58,237,0.55);
+  border-radius: 50%;
+}
+
+/* ---- Inner content z layering ---- */
+.owner-content {
+  position: relative;
+  z-index: 1;
+}

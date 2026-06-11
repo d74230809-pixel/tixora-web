@@ -1,9 +1,16 @@
 import { z } from "zod";
 import { TRPCError, router, adminProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { getBotGuilds, getGuildInfo } from "../discord";
+import { getBotGuilds, getGuildInfo, getGuildChannels, postToChannel } from "../discord";
+import { ENV } from "../_core/env";
+
+// ---- In-memory maintenance mode state ----
+// TODO: persist to Supabase settings table for cross-restart durability
+let maintenanceState = { active: false, message: "" };
 
 export const adminRouter = router({
+  // ---- Existing endpoints ----
+
   getOverview: adminProcedure.query(async () => {
     const db = getDb();
     const [guilds, tickets, openTickets, ratings] = await Promise.all([
@@ -13,7 +20,9 @@ export const adminRouter = router({
       db.from("ticket_ratings").select("rating"),
     ]);
     const ratingData = (ratings.data ?? []) as { rating: number }[];
-    const avgRating = ratingData.length > 0 ? ratingData.reduce((s, r) => s + r.rating, 0) / ratingData.length : null;
+    const avgRating = ratingData.length > 0
+      ? ratingData.reduce((s, r) => s + r.rating, 0) / ratingData.length
+      : null;
     return {
       totalGuilds: guilds.count ?? 0,
       totalTickets: tickets.count ?? 0,
@@ -71,11 +80,7 @@ export const adminRouter = router({
   }),
 
   createChangelog: adminProcedure
-    .input(z.object({
-      version: z.string(),
-      title: z.string(),
-      body_md: z.string(),
-    }))
+    .input(z.object({ version: z.string(), title: z.string(), body_md: z.string() }))
     .mutation(async ({ input }) => {
       const db = getDb();
       const { data, error } = await db.from("changelogs").insert({ ...input, published_at: new Date().toISOString() }).select().single();
@@ -105,7 +110,7 @@ export const adminRouter = router({
         guild_id: input.guildId,
         user_id: input.userId,
         reason: input.reason,
-        created_by: ctx.user.id,
+        created_by: ctx.user.discordId,
       }).select().single();
       if (error) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error.message });
       return data;
@@ -128,23 +133,20 @@ export const adminRouter = router({
       db.from("ticket_ratings").select("created_at, rating"),
     ]);
 
-    // Daily ticket grouping
     const ticketStats = (tickets.data ?? []).reduce((acc: any, t: any) => {
-      const date = new Date(t.opened_at).toISOString().split('T')[0];
+      const date = new Date(t.opened_at).toISOString().split("T")[0];
       acc[date] = (acc[date] || 0) + 1;
       return acc;
     }, {});
 
-    // Daily guild grouping
     const guildStats = (guilds.data ?? []).reduce((acc: any, g: any) => {
-      const date = new Date(g.created_at).toISOString().split('T')[0];
+      const date = new Date(g.created_at).toISOString().split("T")[0];
       acc[date] = (acc[date] || 0) + 1;
       return acc;
     }, {});
 
-    // Average rating over time
     const ratingStats = (ratings.data ?? []).reduce((acc: any, r: any) => {
-      const date = new Date(r.created_at).toISOString().split('T')[0];
+      const date = new Date(r.created_at).toISOString().split("T")[0];
       if (!acc[date]) acc[date] = { sum: 0, count: 0 };
       acc[date].sum += r.rating;
       acc[date].count += 1;
@@ -157,7 +159,116 @@ export const adminRouter = router({
       dailyRatings: Object.entries(ratingStats).map(([date, val]: [string, any]) => ({ date, rating: val.sum / val.count })).sort((a, b) => a.date.localeCompare(b.date)),
       totalTickets: tickets.data?.length ?? 0,
       totalGuilds: guilds.data?.length ?? 0,
-      avgRating: (ratings.data ?? []).length > 0 ? (ratings.data ?? []).reduce((s, r) => s + r.rating, 0) / (ratings.data ?? []).length : 0,
+      avgRating: (ratings.data ?? []).length > 0
+        ? (ratings.data ?? []).reduce((s: number, r: any) => s + r.rating, 0) / (ratings.data ?? []).length
+        : 0,
     };
   }),
+
+  // ---- New owner endpoints ----
+
+  getBotStatus: adminProcedure.query(async () => {
+    if (!ENV.discordBotToken) {
+      return { online: false, guildsCount: 0, username: null, avatar: null, id: null, uptimeSeconds: 0 };
+    }
+    try {
+      const [userRes, botGuilds] = await Promise.all([
+        fetch("https://discord.com/api/v10/users/@me", {
+          headers: { Authorization: `Bot ${ENV.discordBotToken}` },
+        }),
+        getBotGuilds().catch(() => []),
+      ]);
+      if (!userRes.ok) {
+        return { online: false, guildsCount: 0, username: null, avatar: null, id: null, uptimeSeconds: process.uptime() };
+      }
+      const botUser = await userRes.json() as { id: string; username: string; avatar: string | null };
+      return {
+        online: true,
+        guildsCount: botGuilds.length,
+        username: botUser.username,
+        avatar: botUser.avatar,
+        id: botUser.id,
+        uptimeSeconds: process.uptime(),
+      };
+    } catch {
+      return { online: false, guildsCount: 0, username: null, avatar: null, id: null, uptimeSeconds: 0 };
+    }
+  }),
+
+  getSystemInfo: adminProcedure.query(async () => {
+    const db = getDb();
+    const mem = process.memoryUsage();
+
+    // Check DB
+    let dbStatus = false;
+    try {
+      const { error } = await db.from("guilds").select("guild_id", { count: "exact", head: true });
+      dbStatus = !error;
+    } catch { dbStatus = false; }
+
+    // Check Discord API
+    let discordStatus = false;
+    try {
+      const res = await fetch("https://discord.com/api/v10/gateway");
+      discordStatus = res.ok;
+    } catch { discordStatus = false; }
+
+    // Check bot
+    let botStatus = false;
+    if (ENV.discordBotToken) {
+      try {
+        const res = await fetch("https://discord.com/api/v10/users/@me", {
+          headers: { Authorization: `Bot ${ENV.discordBotToken}` },
+        });
+        botStatus = res.ok;
+      } catch { botStatus = false; }
+    }
+
+    return {
+      nodeVersion: process.version,
+      env: ENV.isProduction ? "PRODUCTION" : "DEVELOPMENT",
+      uptime: process.uptime(),
+      dbStatus,
+      discordStatus,
+      botStatus,
+      memUsed: mem.heapUsed / 1024 / 1024,
+      memTotal: mem.heapTotal / 1024 / 1024,
+      envKeys: [
+        "DISCORD_CLIENT_ID",
+        "DISCORD_CLIENT_SECRET",
+        "DISCORD_BOT_TOKEN",
+        "JWT_SECRET",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "DATABASE_URL",
+        "NODE_ENV",
+        "PORT",
+        "BOT_API_KEY",
+      ],
+    };
+  }),
+
+  getGuildChannelsForBroadcast: adminProcedure
+    .input(z.object({ guildId: z.string() }))
+    .query(async ({ input }) => {
+      const channels = await getGuildChannels(input.guildId).catch(() => []);
+      // Type 0 = text channel
+      return channels.filter((c) => c.type === 0).map((c) => ({ id: c.id, name: c.name }));
+    }),
+
+  sendAnnouncement: adminProcedure
+    .input(z.object({ channelId: z.string(), message: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      await postToChannel(input.channelId, { content: input.message });
+      return { success: true };
+    }),
+
+  getMaintenanceMode: adminProcedure.query(() => maintenanceState),
+
+  setMaintenanceMode: adminProcedure
+    .input(z.object({ active: z.boolean(), message: z.string().optional() }))
+    .mutation(({ input }) => {
+      maintenanceState = { active: input.active, message: input.message ?? "" };
+      return maintenanceState;
+    }),
 });

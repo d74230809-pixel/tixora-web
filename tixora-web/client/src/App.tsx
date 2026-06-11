@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import GuildLayout from "./pages/guild/Layout";
 import NotFound from "./pages/NotFound";
 import Templates from "./pages/Templates";
-import Admin from "./pages/Admin";
+import Owner from "./pages/Owner";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/dashboard/:guildId/:tab?" component={GuildLayout} />
             <Route path="/templates" component={Templates} />
-            <Route path="/admin" component={Admin} />
+            <Route path="/owner" component={Owner} />
             <Route component={NotFound} />
           </Switch>
         </TooltipProvider>
