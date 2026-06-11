@@ -1,0 +1,31 @@
+2026-06-11T15:10:28.167212907Z [inf]  scheduling build on Metal builder "production-builderv3-us-west1-bkh9"
+2026-06-11T15:10:29.338860034Z [inf]  unpacking archive
+2026-06-11T15:10:29.444095568Z [inf]  using build driver railpack-v0.27.0
+2026-06-11T15:10:29.448210955Z [inf]  uploading snapshot
+2026-06-11T15:10:29.612677953Z [inf]                     
+2026-06-11T15:10:29.612680390Z [inf]  [38;2;125;86;243m╭─────────────────╮[0m
+2026-06-11T15:10:29.612681209Z [inf]  [38;2;125;86;243m│[0m Railpack 0.27.0 [38;2;125;86;243m│[0m
+2026-06-11T15:10:29.612682248Z [inf]  [38;2;125;86;243m╰─────────────────╯[0m
+2026-06-11T15:10:29.612683313Z [inf]  
+2026-06-11T15:10:29.612684261Z [inf]    [97m↳ Detected Node[0m
+2026-06-11T15:10:29.612685795Z [inf]    [97m↳ Using pnpm package manager[0m
+2026-06-11T15:10:29.612686947Z [inf]    [97m↳ Found workspace with 7 packages[0m
+2026-06-11T15:10:29.612687889Z [inf]    [1;31m✖ No start command detected. Specify a start command: https://railpack.com/config/file[0m
+2026-06-11T15:10:29.612689022Z [inf]    
+2026-06-11T15:10:29.612690057Z [inf]    To configure your start command, Railpack will check:
+2026-06-11T15:10:29.612690765Z [inf]    
+2026-06-11T15:10:29.612691720Z [inf]    1. A "start" script in your package.json:
+2026-06-11T15:10:29.612692528Z [inf]       "scripts": {
+2026-06-11T15:10:29.612693535Z [inf]         "start": "node index.js"
+2026-06-11T15:10:29.612694584Z [inf]       }
+2026-06-11T15:10:29.612695388Z [inf]    
+2026-06-11T15:10:29.612696227Z [inf]    2. A "main" field in your package.json pointing to your entry file:
+2026-06-11T15:10:29.612696932Z [inf]       "main": "src/server.js"
+2026-06-11T15:10:29.612697475Z [inf]    
+2026-06-11T15:10:29.612698317Z [inf]    3. An index.js or index.ts file in your project root
+2026-06-11T15:10:29.612698831Z [inf]    
+2026-06-11T15:10:29.612700381Z [inf]    If you have a static site, you can set the RAILPACK_SPA_OUTPUT_DIR environment variable
+2026-06-11T15:10:29.612701342Z [inf]    containing the directory of your built static files.
+2026-06-11T15:10:29.612702157Z [inf]  
+2026-06-11T15:10:29.612702803Z [inf]  
+2026-06-11T15:10:29.613601341Z [err]  railpack process exited with an error
