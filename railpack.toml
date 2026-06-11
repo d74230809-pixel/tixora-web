@@ -1,6 +1,6 @@
 [phases.install]
 cmds = [
-  "pnpm install --no-frozen-lockfile --prefer-offline"
+  "cd tixora-web && pnpm install --no-frozen-lockfile"
 ]
 
 [phases.build]

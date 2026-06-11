@@ -1,9 +1,9 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "buildCommand": "pnpm install --no-frozen-lockfile && pnpm run build"
+    "buildCommand": "cd tixora-web && pnpm install --no-frozen-lockfile && pnpm run build"
   },
   "deploy": {
-    "startCommand": "node dist/index.js"
+    "startCommand": "node tixora-web/dist/index.js"
   }
 }
