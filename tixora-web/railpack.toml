@@ -1,0 +1,7 @@
+# Railpack config — override install to allow new deps without lockfile update
+  [phases.install]
+  cmds = [
+    "npm i -g corepack@latest && corepack enable && corepack prepare --activate",
+    "pnpm install --no-frozen-lockfile --prefer-offline"
+  ]
+  

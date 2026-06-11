@@ -1,0 +1,6 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "buildCommand": "pnpm install --no-frozen-lockfile && pnpm run build"
+  }
+}
