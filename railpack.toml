@@ -1,0 +1,13 @@
+[phases.install]
+cmds = [
+  "cd tixora-web && npm i -g corepack@latest && corepack enable && corepack prepare --activate",
+  "cd tixora-web && pnpm install --no-frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "cd tixora-web && pnpm run build"
+]
+
+[start]
+cmd = "sh -c 'cd tixora-web && node dist/index.js'"
